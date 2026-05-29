@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Monday Countdown</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      color: #fff;
+      font-family: monospace;
+    }
+    h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+    #countdown {
+      font-size: 3rem;
+    }
+    .particle {
+      position: fixed;
+      bottom: -1em;
+      pointer-events: none;
+      animation: float linear forwards;
+      opacity: 0;
+    }
+    @keyframes float {
+      0%   { transform: translateY(0)   rotate(0deg);   opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Monday Tracker</h1>
+  <div id="countdown"></div>
+  <script>
+    function getNextMonday() {
+      const now = new Date();
+      const day = now.getDay();
+      const daysUntilMonday = day === 1 ? 7 : (8 - day) % 7;
+      const next = new Date(now);
+      next.setDate(now.getDate() + daysUntilMonday);
+      next.setHours(0, 0, 0, 0);
+      return next;
+    }
+
+    function update() {
+      const now = new Date();
+      const diff = getNextMonday() - now;
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000).toString().padStart(2, '0');
+      const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+      const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+      document.getElementById('countdown').textContent =
+        `${days}d ${hours}:${minutes}:${seconds}`;
+    }
+
+    const shapes = ['✦', '✧', '★', '·', '✶', '•'];
+
+    function spawnParticle() {
+      const el = document.createElement('span');
+      el.className = 'particle';
+      el.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+
+      const size = 0.8 + Math.random() * 1.4;
+      const duration = 4 + Math.random() * 6;
+      const left = Math.random() * 100;
+      const hue = Math.floor(Math.random() * 360);
+
+      el.style.cssText = `
+        left: ${left}vw;
+        font-size: ${size}rem;
+        color: hsl(${hue}, 90%, 70%);
+        animation-duration: ${duration}s;
+      `;
+
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+
+    update();
+    setInterval(update, 1000);
+    setInterval(spawnParticle, 400);
+  </script>
+</body>
+</html>
